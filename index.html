@@ -222,6 +222,7 @@
             font-size: 12px;
             cursor: pointer;
             transition: background 0.3s;
+            z-index: 10;
         }
         
         .btn-copy:hover {
@@ -241,12 +242,17 @@
         
         /* 미리보기 스타일 */
         .preview-box {
-            background: white;
-            border: 2px solid #dee2e6;
+            background: #fff;
+            border: 2px solid #667eea;
             border-radius: 8px;
             padding: 20px;
             margin-top: 15px;
             min-height: 100px;
+        }
+        
+        .preview-box img {
+            max-width: 100%;
+            height: auto;
         }
         
         .preview-label {
@@ -606,7 +612,7 @@
                 <div class="generator-box">
                     <h2><span class="badge">5</span> 일괄 생성</h2>
                     <p style="font-size: 13px; color: #666; margin-bottom: 15px;">
-                        모든 입력값을 기반으로 한 번에 생성합니다
+                        입력된 값만 생성합니다 (비어있는 칸은 건너뜀)
                     </p>
                     <button class="btn-generate" onclick="generateAll()" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
                         전체 일괄 생성
@@ -920,7 +926,7 @@
             
             if (previewEl.style.display === 'none') {
                 previewEl.style.display = 'block';
-                previewEl.innerHTML = outputEl.value;
+                previewEl.innerHTML = outputEl.value || '<p style="color: #999;">생성된 코드가 없습니다.</p>';
             } else {
                 previewEl.style.display = 'none';
             }
@@ -928,45 +934,47 @@
         
         // 1. 일반 링크 생성
         function generateLink1() {
-            const url = document.getElementById('link1-url').value;
-            const text = document.getElementById('link1-text').value;
+            const url = document.getElementById('link1-url').value.trim();
+            const text = document.getElementById('link1-text').value.trim();
             const target = document.getElementById('link1-target').value;
             
             if (!url || !text) {
-                alert('모든 필드를 입력해주세요.');
-                return;
+                alert('링크 URL과 텍스트를 입력해주세요.');
+                return false;
             }
             
             const html = `<a href="${url}" target="${target}" rel="nofollow sponsored">\n  ${text}\n</a>`;
             document.getElementById('output1').value = html;
             saveToHistory(html, '일반 링크');
+            return true;
         }
         
         // 2. 쿠팡 링크 생성
         function generateLink2() {
-            const url = document.getElementById('link2-url').value;
-            const text = document.getElementById('link2-text').value;
+            const url = document.getElementById('link2-url').value.trim();
+            const text = document.getElementById('link2-text').value.trim();
             
             if (!url) {
                 alert('쿠팡 URL을 입력해주세요.');
-                return;
+                return false;
             }
             
             const html = `<a href="${url}" target="_blank" rel="nofollow sponsored">\n  ${text}\n</a>`;
             document.getElementById('output2').value = html;
             saveToHistory(html, '쿠팡 링크');
+            return true;
         }
         
-        // 3. 이미지 링크 생성 (수정됨 - 링크 선택사항)
+        // 3. 이미지 링크 생성 (링크 선택사항)
         function generateLink3() {
-            const url = document.getElementById('link3-url').value;
-            const img = document.getElementById('link3-img').value;
-            const alt = document.getElementById('link3-alt').value;
+            const url = document.getElementById('link3-url').value.trim();
+            const img = document.getElementById('link3-img').value.trim();
+            const alt = document.getElementById('link3-alt').value.trim();
             const target = document.getElementById('link3-target').value;
             
             if (!img || !alt) {
                 alert('이미지 URL과 이미지 설명은 필수입니다.');
-                return;
+                return false;
             }
             
             let html = '';
@@ -981,23 +989,322 @@
             
             document.getElementById('output3').value = html;
             saveToHistory(html, '이미지 링크');
+            return true;
         }
         
         // 4. 공정위 문구 생성
         function generateLink4() {
-            const text = document.getElementById('link4-text').value;
+            const text = document.getElementById('link4-text').value.trim();
             
             if (!text) {
                 alert('문구를 입력해주세요.');
-                return;
+                return false;
             }
             
             const html = `<div style="margin-top: 20px; font-size: 12px; color: #999; text-align: center;">\n  <p>${text}</p>\n</div>`;
             document.getElementById('output4').value = html;
             saveToHistory(html, '공정위 문구');
+            return true;
         }
         
-        // 5. 전체 일괄 생성
+        // 5. 전체 일괄 생성 (수정됨 - 입력된 것만 생성)
         function generateAll() {
-            generateLink1();
-            genera
+            let results = [];
+            
+            // 각 항목을 개별적으로 생성 시도
+            const gen1 = tryGenerate(1, generateLink1, '일반 링크');
+            const gen2 = tryGenerate(2, generateLink2, '쿠팡 링크');
+            const gen3 = tryGenerate(3, generateLink3, '이미지 링크');
+            const gen4 = tryGenerate(4, generateLink4, '공정위 문구');
+            
+            if (gen1) results.push(gen1);
+            if (gen2) results.push(gen2);
+            if (gen3) results.push(gen3);
+            if (gen4) results.push(gen4);
+            
+            if (results.length === 0) {
+                alert('생성할 내용이 없습니다. 최소 1개 이상의 항목을 입력해주세요.');
+                return;
+            }
+            
+            const allHtml = results.join('\n\n');
+            document.getElementById('output5').value = allHtml;
+            saveToHistory(allHtml, '일괄 생성');
+        }
+        
+        // 각 생성 함수를 시도하고 결과 반환
+        function tryGenerate(num, func, label) {
+            try {
+                // 해당 함수 실행
+                const success = func();
+                if (success) {
+                    const output = document.getElementById('output' + num).value;
+                    if (output) {
+                        return `<!-- ${label} -->\n${output}`;
+                    }
+                }
+            } catch (e) {
+                // 에러 무시하고 다음으로
+            }
+            return null;
+        }
+        
+        // 클립보드 복사
+        function copyToClipboard(elementId, button) {
+            const textarea = document.getElementById(elementId);
+            const text = textarea.value;
+            
+            if (!text) {
+                alert('생성된 코드가 없습니다.');
+                return;
+            }
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '복사됨!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                alert('복사 실패: ' + err);
+            });
+        }
+        
+        // 테이블 행 추가
+        function addTableRow() {
+            const table = document.getElementById('editableTable');
+            const tbody = table.querySelector('tbody');
+            const columnCount = table.querySelector('thead tr').children.length;
+            
+            const newRow = document.createElement('tr');
+            for (let i = 0; i < columnCount; i++) {
+                const td = document.createElement('td');
+                td.innerHTML = `
+                    <div class="cell-content" contenteditable="true">데이터 ${i + 1}</div>
+                    <div class="cell-actions">
+                        <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
+                        <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
+                    </div>
+                `;
+                newRow.appendChild(td);
+            }
+            tbody.appendChild(newRow);
+        }
+        
+        // 테이블 행 삭제
+        function removeTableRow() {
+            const table = document.getElementById('editableTable');
+            const tbody = table.querySelector('tbody');
+            if (tbody.children.length > 1) {
+                tbody.removeChild(tbody.lastChild);
+            } else {
+                alert('최소 1개의 행은 있어야 합니다.');
+            }
+        }
+        
+        // 테이블 열 추가
+        function addTableColumn() {
+            const table = document.getElementById('editableTable');
+            const thead = table.querySelector('thead tr');
+            const tbody = table.querySelector('tbody');
+            
+            const th = document.createElement('th');
+            th.innerHTML = '<div class="cell-content" contenteditable="true">헤더 ' + (thead.children.length + 1) + '</div>';
+            thead.appendChild(th);
+            
+            Array.from(tbody.children).forEach(row => {
+                const td = document.createElement('td');
+                td.innerHTML = `
+                    <div class="cell-content" contenteditable="true">데이터</div>
+                    <div class="cell-actions">
+                        <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
+                        <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
+                    </div>
+                `;
+                row.appendChild(td);
+            });
+        }
+        
+        // 테이블 열 삭제
+        function removeTableColumn() {
+            const table = document.getElementById('editableTable');
+            const thead = table.querySelector('thead tr');
+            const tbody = table.querySelector('tbody');
+            
+            if (thead.children.length > 1) {
+                thead.removeChild(thead.lastChild);
+                Array.from(tbody.children).forEach(row => {
+                    row.removeChild(row.lastChild);
+                });
+            } else {
+                alert('최소 1개의 열은 있어야 합니다.');
+            }
+        }
+        
+        // 테이블 초기화
+        function resetTable() {
+            if (confirm('테이블을 초기화하시겠습니까?')) {
+                const table = document.getElementById('editableTable');
+                const thead = table.querySelector('thead tr');
+                const tbody = table.querySelector('tbody');
+                
+                thead.innerHTML = `
+                    <th><div class="cell-content" contenteditable="true">헤더 1</div></th>
+                    <th><div class="cell-content" contenteditable="true">헤더 2</div></th>
+                    <th><div class="cell-content" contenteditable="true">헤더 3</div></th>
+                    <th><div class="cell-content" contenteditable="true">헤더 4</div></th>
+                `;
+                
+                tbody.innerHTML = `
+                    <tr>
+                        <td>
+                            <div class="cell-content" contenteditable="true">데이터 1</div>
+                            <div class="cell-actions">
+                                <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
+                                <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="cell-content" contenteditable="true">데이터 2</div>
+                            <div class="cell-actions">
+                                <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
+                                <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="cell-content" contenteditable="true">데이터 3</div>
+                            <div class="cell-actions">
+                                <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
+                                <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="cell-content" contenteditable="true">데이터 4</div>
+                            <div class="cell-actions">
+                                <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
+                                <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+        
+        // 셀에 링크 추가
+        function addLinkToCell(button) {
+            currentCell = button.parentElement.parentElement.querySelector('.cell-content');
+            document.getElementById('modalLinkText').value = currentCell.textContent.trim();
+            document.getElementById('linkModal').classList.add('active');
+        }
+        
+        // 셀에 이미지 추가
+        function addImageToCell(button) {
+            currentCell = button.parentElement.parentElement.querySelector('.cell-content');
+            document.getElementById('imageModal').classList.add('active');
+        }
+        
+        // 모달 닫기
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            currentCell = null;
+        }
+        
+        // 링크 추가 확인
+        function confirmAddLink() {
+            const url = document.getElementById('modalLinkUrl').value.trim();
+            const text = document.getElementById('modalLinkText').value.trim();
+            const target = document.getElementById('modalLinkTarget').value;
+            
+            if (!url || !text) {
+                alert('모든 필드를 입력해주세요.');
+                return;
+            }
+            
+            currentCell.innerHTML = `<a href="${url}" target="${target}" rel="nofollow sponsored">${text}</a>`;
+            closeModal('linkModal');
+            
+            // 입력 필드 초기화
+            document.getElementById('modalLinkUrl').value = '';
+            document.getElementById('modalLinkText').value = '';
+        }
+        
+        // 이미지 추가 확인
+        function confirmAddImage() {
+            const imageUrl = document.getElementById('modalImageUrl').value.trim();
+            const imageAlt = document.getElementById('modalImageAlt').value.trim();
+            const linkUrl = document.getElementById('modalImageLink').value.trim();
+            const target = document.getElementById('modalImageTarget').value;
+            
+            if (!imageUrl || !imageAlt) {
+                alert('이미지 URL과 설명은 필수입니다.');
+                return;
+            }
+            
+            let html = `<img src="${imageUrl}" alt="${imageAlt}" style="max-width:100%; height:auto;" loading="lazy" decoding="async" />`;
+            
+            if (linkUrl) {
+                html = `<a href="${linkUrl}" target="${target}" rel="nofollow sponsored">${html}</a>`;
+            }
+            
+            currentCell.innerHTML = html;
+            closeModal('imageModal');
+            
+            // 입력 필드 초기화
+            document.getElementById('modalImageUrl').value = '';
+            document.getElementById('modalImageAlt').value = '';
+            document.getElementById('modalImageLink').value = '';
+        }
+        
+        // 테이블 HTML 생성
+        function generateTableCode() {
+            const table = document.getElementById('editableTable');
+            const thead = table.querySelector('thead');
+            const tbody = table.querySelector('tbody');
+            
+            let html = '<div style="overflow-x: auto; margin: 30px 0;">\n';
+            html += '  <table style="width: 100%; border-collapse: collapse; min-width: 500px;">\n';
+            
+            // 헤더
+            html += '    <thead>\n';
+            html += '      <tr style="background-color: #f0f0f0; border-bottom: 2px solid #ccc;">\n';
+            Array.from(thead.querySelectorAll('th')).forEach(th => {
+                const content = th.querySelector('.cell-content').innerHTML;
+                html += `        <th style="padding: 12px; text-align: left; font-weight: bold;">${content}</th>\n`;
+            });
+            html += '      </tr>\n';
+            html += '    </thead>\n';
+            
+            // 바디
+            html += '    <tbody>\n';
+            Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+                html += '      <tr style="border-bottom: 1px solid #eee;">\n';
+                Array.from(tr.querySelectorAll('td')).forEach(td => {
+                    const content = td.querySelector('.cell-content').innerHTML;
+                    html += `        <td style="padding: 12px;">${content}</td>\n`;
+                });
+                html += '      </tr>\n';
+            });
+            html += '    </tbody>\n';
+            
+            html += '  </table>\n';
+            html += '</div>';
+            
+            document.getElementById('tableOutput').value = html;
+            saveToHistory(html, '테이블');
+        }
+        
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+        
+        // 페이지 로드 시 히스토리 로드
+        loadHistory();
+    </script>
+</body>
+</html>
