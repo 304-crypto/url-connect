@@ -571,8 +571,8 @@
                 <div class="generator-box">
                     <h2><span class="badge">3</span> 이미지 링크</h2>
                     <div class="input-group">
-                        <label>🌐 링크 URL</label>
-                        <input type="text" id="link3-url" placeholder="https://example.com" onkeydown="handleShortcut(event, generateLink3)">
+                        <label>🌐 링크 URL (선택사항)</label>
+                        <input type="text" id="link3-url" placeholder="비워두면 이미지만 표시됩니다" onkeydown="handleShortcut(event, generateLink3)">
                     </div>
                     <div class="input-group">
                         <label>🖼️ 이미지 URL</label>
@@ -765,7 +765,7 @@
                 <input type="text" id="modalLinkUrl" placeholder="https://example.com">
             </div>
             <div class="input-group">
-                <label>✏️링크 텍스트</label>
+                <label>✏️ 링크 텍스트</label>
                 <input type="text" id="modalLinkText" placeholder="클릭할 텍스트">
             </div>
             <div class="input-group">
@@ -957,19 +957,28 @@
             saveToHistory(html, '쿠팡 링크');
         }
         
-        // 3. 이미지 링크 생성
+        // 3. 이미지 링크 생성 (수정됨 - 링크 선택사항)
         function generateLink3() {
             const url = document.getElementById('link3-url').value;
             const img = document.getElementById('link3-img').value;
             const alt = document.getElementById('link3-alt').value;
             const target = document.getElementById('link3-target').value;
             
-            if (!url || !img || !alt) {
-                alert('모든 필드를 입력해주세요.');
+            if (!img || !alt) {
+                alert('이미지 URL과 이미지 설명은 필수입니다.');
                 return;
             }
             
-            const html = `<a href="${url}" target="${target}" rel="nofollow sponsored">\n  <img\n    src="${img}"\n    alt="${alt}"\n    style="display:block; margin:0 auto; max-width:100%; height:auto;"\n    loading="lazy"\n    decoding="async"\n  />\n</a><br>`;
+            let html = '';
+            
+            // 링크 URL이 있으면 링크로 감싸기
+            if (url) {
+                html = `<a href="${url}" target="${target}" rel="nofollow sponsored">\n  <img\n    src="${img}"\n    alt="${alt}"\n    style="display:block; margin:0 auto; max-width:100%; height:auto;"\n    loading="lazy"\n    decoding="async"\n  />\n</a><br>`;
+            } else {
+                // 링크 URL이 없으면 이미지만
+                html = `<img\n  src="${img}"\n  alt="${alt}"\n  style="display:block; margin:0 auto; max-width:100%; height:auto;"\n  loading="lazy"\n  decoding="async"\n/><br>`;
+            }
+            
             document.getElementById('output3').value = html;
             saveToHistory(html, '이미지 링크');
         }
@@ -991,277 +1000,4 @@
         // 5. 전체 일괄 생성
         function generateAll() {
             generateLink1();
-            generateLink2();
-            generateLink3();
-            generateLink4();
-            
-            const output1 = document.getElementById('output1').value;
-            const output2 = document.getElementById('output2').value;
-            const output3 = document.getElementById('output3').value;
-            const output4 = document.getElementById('output4').value;
-            
-            const allHtml = `<!-- 일반 링크 -->\n${output1}\n\n<!-- 쿠팡 링크 -->\n${output2}\n\n<!-- 이미지 링크 -->\n${output3}\n\n<!-- 공정위 문구 -->\n${output4}`;
-            
-            document.getElementById('output5').value = allHtml;
-            saveToHistory(allHtml, '일괄 생성');
-        }
-        
-        // 클립보드 복사
-        function copyToClipboard(elementId, button) {
-            const textarea = document.getElementById(elementId);
-            const text = textarea.value;
-            
-            if (!text) {
-                alert('생성된 코드가 없습니다.');
-                return;
-            }
-            
-            navigator.clipboard.writeText(text).then(() => {
-                const originalText = button.textContent;
-                button.textContent = '복사됨!';
-                button.classList.add('copied');
-                
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.classList.remove('copied');
-                }, 2000);
-            }).catch(err => {
-                alert('복사 실패: ' + err);
-            });
-        }
-        
-        // 테이블 행 추가
-        function addTableRow() {
-            const table = document.getElementById('editableTable');
-            const tbody = table.querySelector('tbody');
-            const columnCount = table.querySelector('thead tr').children.length;
-            
-            const newRow = document.createElement('tr');
-            for (let i = 0; i < columnCount; i++) {
-                const td = document.createElement('td');
-                td.innerHTML = `
-                    <div class="cell-content" contenteditable="true">데이터 ${i + 1}</div>
-                    <div class="cell-actions">
-                        <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
-                        <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
-                    </div>
-                `;
-                newRow.appendChild(td);
-            }
-            tbody.appendChild(newRow);
-        }
-        
-        // 테이블 행 삭제
-        function removeTableRow() {
-            const table = document.getElementById('editableTable');
-            const tbody = table.querySelector('tbody');
-            if (tbody.children.length > 1) {
-                tbody.removeChild(tbody.lastChild);
-            } else {
-                alert('최소 1개의 행은 있어야 합니다.');
-            }
-        }
-        
-        // 테이블 열 추가
-        function addTableColumn() {
-            const table = document.getElementById('editableTable');
-            const thead = table.querySelector('thead tr');
-            const tbody = table.querySelector('tbody');
-            
-            const th = document.createElement('th');
-            th.innerHTML = '<div class="cell-content" contenteditable="true">헤더 ' + (thead.children.length + 1) + '</div>';
-            thead.appendChild(th);
-            
-            Array.from(tbody.children).forEach(row => {
-                const td = document.createElement('td');
-                td.innerHTML = `
-                    <div class="cell-content" contenteditable="true">데이터</div>
-                    <div class="cell-actions">
-                        <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
-                        <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
-                    </div>
-                `;
-                row.appendChild(td);
-            });
-        }
-        
-        // 테이블 열 삭제
-        function removeTableColumn() {
-            const table = document.getElementById('editableTable');
-            const thead = table.querySelector('thead tr');
-            const tbody = table.querySelector('tbody');
-            
-            if (thead.children.length > 1) {
-                thead.removeChild(thead.lastChild);
-                Array.from(tbody.children).forEach(row => {
-                    row.removeChild(row.lastChild);
-                });
-            } else {
-                alert('최소 1개의 열은 있어야 합니다.');
-            }
-        }
-        
-        // 테이블 초기화
-        function resetTable() {
-            if (confirm('테이블을 초기화하시겠습니까?')) {
-                const table = document.getElementById('editableTable');
-                const thead = table.querySelector('thead tr');
-                const tbody = table.querySelector('tbody');
-                
-                thead.innerHTML = `
-                    <th><div class="cell-content" contenteditable="true">헤더 1</div></th>
-                    <th><div class="cell-content" contenteditable="true">헤더 2</div></th>
-                    <th><div class="cell-content" contenteditable="true">헤더 3</div></th>
-                    <th><div class="cell-content" contenteditable="true">헤더 4</div></th>
-                `;
-                
-                tbody.innerHTML = `
-                    <tr>
-                        <td>
-                            <div class="cell-content" contenteditable="true">데이터 1</div>
-                            <div class="cell-actions">
-                                <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
-                                <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="cell-content" contenteditable="true">데이터 2</div>
-                            <div class="cell-actions">
-                                <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
-                                <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="cell-content" contenteditable="true">데이터 3</div>
-                            <div class="cell-actions">
-                                <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
-                                <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="cell-content" contenteditable="true">데이터 4</div>
-                            <div class="cell-actions">
-                                <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
-                                <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }
-        }
-        
-        // 셀에 링크 추가
-        function addLinkToCell(button) {
-            currentCell = button.parentElement.parentElement.querySelector('.cell-content');
-            document.getElementById('modalLinkText').value = currentCell.textContent.trim();
-            document.getElementById('linkModal').classList.add('active');
-        }
-        
-        // 셀에 이미지 추가
-        function addImageToCell(button) {
-            currentCell = button.parentElement.parentElement.querySelector('.cell-content');
-            document.getElementById('imageModal').classList.add('active');
-        }
-        
-        // 모달 닫기
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-            currentCell = null;
-        }
-        
-        // 링크 추가 확인
-        function confirmAddLink() {
-            const url = document.getElementById('modalLinkUrl').value;
-            const text = document.getElementById('modalLinkText').value;
-            const target = document.getElementById('modalLinkTarget').value;
-            
-            if (!url || !text) {
-                alert('모든 필드를 입력해주세요.');
-                return;
-            }
-            
-            currentCell.innerHTML = `<a href="${url}" target="${target}" rel="nofollow sponsored">${text}</a>`;
-            closeModal('linkModal');
-            
-            // 입력 필드 초기화
-            document.getElementById('modalLinkUrl').value = '';
-            document.getElementById('modalLinkText').value = '';
-        }
-        
-        // 이미지 추가 확인
-        function confirmAddImage() {
-            const imageUrl = document.getElementById('modalImageUrl').value;
-            const imageAlt = document.getElementById('modalImageAlt').value;
-            const linkUrl = document.getElementById('modalImageLink').value;
-            const target = document.getElementById('modalImageTarget').value;
-            
-            if (!imageUrl || !imageAlt) {
-                alert('이미지 URL과 설명은 필수입니다.');
-                return;
-            }
-            
-            let html = `<img src="${imageUrl}" alt="${imageAlt}" style="max-width:100%; height:auto;" loading="lazy" decoding="async" />`;
-            
-            if (linkUrl) {
-                html = `<a href="${linkUrl}" target="${target}" rel="nofollow sponsored">${html}</a>`;
-            }
-            
-            currentCell.innerHTML = html;
-            closeModal('imageModal');
-            
-            // 입력 필드 초기화
-            document.getElementById('modalImageUrl').value = '';
-            document.getElementById('modalImageAlt').value = '';
-            document.getElementById('modalImageLink').value = '';
-        }
-        
-        // 테이블 HTML 생성
-        function generateTableCode() {
-            const table = document.getElementById('editableTable');
-            const thead = table.querySelector('thead');
-            const tbody = table.querySelector('tbody');
-            
-            let html = '<div style="overflow-x: auto; margin: 30px 0;">\n';
-            html += '  <table style="width: 100%; border-collapse: collapse; min-width: 500px;">\n';
-            
-            // 헤더
-            html += '    <thead>\n';
-            html += '      <tr style="background-color: #f0f0f0; border-bottom: 2px solid #ccc;">\n';
-            Array.from(thead.querySelectorAll('th')).forEach(th => {
-                const content = th.querySelector('.cell-content').innerHTML;
-                html += `        <th style="padding: 12px; text-align: left; font-weight: bold;">${content}</th>\n`;
-            });
-            html += '      </tr>\n';
-            html += '    </thead>\n';
-            
-            // 바디
-            html += '    <tbody>\n';
-            Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
-                html += '      <tr style="border-bottom: 1px solid #eee;">\n';
-                Array.from(tr.querySelectorAll('td')).forEach(td => {
-                    const content = td.querySelector('.cell-content').innerHTML;
-                    html += `        <td style="padding: 12px;">${content}</td>\n`;
-                });
-                html += '      </tr>\n';
-            });
-            html += '    </tbody>\n';
-            
-            html += '  </table>\n';
-            html += '</div>';
-            
-            document.getElementById('tableOutput').value = html;
-            saveToHistory(html, '테이블');
-        }
-        
-        // 모달 외부 클릭 시 닫기
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.classList.remove('active');
-            }
-        }
-        
-        // 페이지 로드 시 히스토리 로드
-        loadHistory();
-    </script>
-</body>
-</html>
+            genera
