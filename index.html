@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML 링크 & 이미지 생성기 Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e9ecef;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .tab:hover {
+            color: #667eea;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .generator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .generator-box {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        
+        .generator-box:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        
+        .generator-box h2 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .badge {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #495057;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus,
+        .input-group textarea:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .input-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .btn-generate {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn-generate:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-generate:active {
+            transform: translateY(0);
+        }
+        
+        .output-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .output-section h2 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        .output-box {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .output-box textarea {
+            width: 100%;
+            min-height: 120px;
+            border: none;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #333;
+            resize: vertical;
+            background: transparent;
+        }
+        
+        .output-box textarea:focus {
+            outline: none;
+        }
+        
+        .btn-copy {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 6px 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn-copy:hover {
+            background: #218838;
+        }
+        
+        .btn-copy.copied {
+            background: #007bff;
+        }
+        
+        .output-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        
+        /* 미리보기 스타일 */
+        .preview-box {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+            min-height: 100px;
+        }
+        
+        .preview-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .preview-toggle {
+            margin-left: auto;
+            padding: 4px 10px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        
+        .preview-toggle:hover {
+            background: #5a6268;
+        }
+        
+        /* 히스토리 스타일 */
+        .history-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 30px;
+        }
+        
+        .history-item {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-item-content {
+            flex: 1;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #333;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-right: 15px;
+        }
+        
+        .history-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-history {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-restore {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-restore:hover {
+            background: #0056b3;
+        }
+        
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #c82333;
+        }
+        
+        /* 테이블 에디터 스타일 */
+        .table-editor {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .table-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .table-controls button {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        
+        .table-controls button:hover {
+            background: #5568d3;
+        }
+        
+        .editable-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-bottom: 20px;
+        }
+        
+        .editable-table th,
+        .editable-table td {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            text-align: left;
+            position: relative;
+        }
+        
+        .editable-table th {
+            background: #f0f0f0;
+            font-weight: bold;
+        }
+        
+        .editable-table td {
+            min-height: 40px;
+        }
+        
+        .cell-content {
+            min-height: 20px;
+            padding: 5px;
+            cursor: text;
+        }
+        
+        .cell-content:hover {
+            background: #f8f9fa;
+        }
+        
+        .cell-content:focus {
+            outline: 2px solid #667eea;
+            background: white;
+        }
+        
+        .cell-actions {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: none;
+            gap: 5px;
+        }
+        
+        .editable-table td:hover .cell-actions {
+            display: flex;
+        }
+        
+        .cell-btn {
+            padding: 3px 8px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        
+        .cell-btn:hover {
+            background: #5a6268;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .modal-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .modal-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .modal-btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .modal-btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .shortcut-info {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #856404;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .generator-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 HTML 링크 & 이미지 생성기 Pro</h1>
+        <p class="subtitle">블로그 작업용 HTML 코드 자동 생성 도구 · 미리보기 · 히스토리 · 테이블 에디터</p>
+        
+        <div class="shortcut-info">
+            ⚡ <strong>단축키:</strong> Ctrl+Enter (각 입력창에서 빠른 생성) · Ctrl+Shift+C (전체 복사)
+        </div>
+        
+        <!-- 탭 메뉴 -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('links')">🔗 링크 생성</button>
+            <button class="tab" onclick="switchTab('table')">📊 테이블 에디터</button>
+            <button class="tab" onclick="switchTab('history')">📜 히스토리</button>
+        </div>
+        
+        <!-- 링크 생성 탭 -->
+        <div id="links-tab" class="tab-content active">
+            <div class="generator-grid">
+                <!-- 1. 일반 링크 -->
+                <div class="generator-box">
+                    <h2><span class="badge">1</span> 일반 링크</h2>
+                    <div class="input-group">
+                        <label>🌐 링크 URL</label>
+                        <input type="text" id="link1-url" placeholder="https://example.com" onkeydown="handleShortcut(event, generateLink1)">
+                    </div>
+                    <div class="input-group">
+                        <label>✏️ 링크 텍스트</label>
+                        <input type="text" id="link1-text" placeholder="클릭할 텍스트" onkeydown="handleShortcut(event, generateLink1)">
+                    </div>
+                    <div class="input-group">
+                        <label>🎯 링크 열기</label>
+                        <select id="link1-target">
+                            <option value="_self">현재 창 (self)</option>
+                            <option value="_blank">새 창 (blank)</option>
+                        </select>
+                    </div>
+                    <button class="btn-generate" onclick="generateLink1()">생성하기</button>
+                </div>
+                
+                <!-- 2. 쿠팡 파트너스 링크 -->
+                <div class="generator-box">
+                    <h2><span class="badge">2</span> 쿠팡 링크</h2>
+                    <div class="input-group">
+                        <label>🛒 쿠팡 파트너스 URL</label>
+                        <input type="text" id="link2-url" placeholder="https://link.coupang.com/a/..." onkeydown="handleShortcut(event, generateLink2)">
+                    </div>
+                    <div class="input-group">
+                        <label>💬 버튼 텍스트</label>
+                        <input type="text" id="link2-text" value="쿠팡에서 가격 확인하기" onkeydown="handleShortcut(event, generateLink2)">
+                    </div>
+                    <button class="btn-generate" onclick="generateLink2()">생성하기</button>
+                </div>
+                
+                <!-- 3. 이미지 링크 -->
+                <div class="generator-box">
+                    <h2><span class="badge">3</span> 이미지 링크</h2>
+                    <div class="input-group">
+                        <label>🌐 링크 URL</label>
+                        <input type="text" id="link3-url" placeholder="https://example.com" onkeydown="handleShortcut(event, generateLink3)">
+                    </div>
+                    <div class="input-group">
+                        <label>🖼️ 이미지 URL</label>
+                        <input type="text" id="link3-img" placeholder="https://example.com/image.jpg" onkeydown="handleShortcut(event, generateLink3)">
+                    </div>
+                    <div class="input-group">
+                        <label>📝 이미지 설명 (alt)</label>
+                        <input type="text" id="link3-alt" placeholder="이미지 설명" onkeydown="handleShortcut(event, generateLink3)">
+                    </div>
+                    <div class="input-group">
+                        <label>🎯 링크 열기</label>
+                        <select id="link3-target">
+                            <option value="_self">현재 창 (self)</option>
+                            <option value="_blank">새 창 (blank)</option>
+                        </select>
+                    </div>
+                    <button class="btn-generate" onclick="generateLink3()">생성하기</button>
+                </div>
+                
+                <!-- 4. 쿠팡 공정위 문구 -->
+                <div class="generator-box">
+                    <h2><span class="badge">4</span> 공정위 문구</h2>
+                    <div class="input-group">
+                        <label>📢 문구 내용</label>
+                        <textarea id="link4-text" onkeydown="handleShortcut(event, generateLink4)">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다</textarea>
+                    </div>
+                    <button class="btn-generate" onclick="generateLink4()">생성하기</button>
+                </div>
+                
+                <!-- 5. 복합 생성 (일괄) -->
+                <div class="generator-box">
+                    <h2><span class="badge">5</span> 일괄 생성</h2>
+                    <p style="font-size: 13px; color: #666; margin-bottom: 15px;">
+                        모든 입력값을 기반으로 한 번에 생성합니다
+                    </p>
+                    <button class="btn-generate" onclick="generateAll()" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        전체 일괄 생성
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 출력 영역 -->
+            <div class="output-section">
+                <h2>📋 생성된 코드</h2>
+                
+                <div class="output-box">
+                    <div class="preview-label">
+                        1. 일반 링크
+                        <button class="preview-toggle" onclick="togglePreview('preview1')">미리보기</button>
+                    </div>
+                    <textarea id="output1" readonly></textarea>
+                    <button class="btn-copy" onclick="copyToClipboard('output1', this)">복사</button>
+                    <div id="preview1" class="preview-box" style="display:none;"></div>
+                </div>
+                
+                <div class="output-box">
+                    <div class="preview-label">
+                        2. 쿠팡 링크
+                        <button class="preview-toggle" onclick="togglePreview('preview2')">미리보기</button>
+                    </div>
+                    <textarea id="output2" readonly></textarea>
+                    <button class="btn-copy" onclick="copyToClipboard('output2', this)">복사</button>
+                    <div id="preview2" class="preview-box" style="display:none;"></div>
+                </div>
+                
+                <div class="output-box">
+                    <div class="preview-label">
+                        3. 이미지 링크
+                        <button class="preview-toggle" onclick="togglePreview('preview3')">미리보기</button>
+                    </div>
+                    <textarea id="output3" readonly></textarea>
+                    <button class="btn-copy" onclick="copyToClipboard('output3', this)">복사</button>
+                    <div id="preview3" class="preview-box" style="display:none;"></div>
+                </div>
+                
+                <div class="output-box">
+                    <div class="preview-label">
+                        4. 공정위 문구
+                        <button class="preview-toggle" onclick="togglePreview('preview4')">미리보기</button>
+                    </div>
+                    <textarea id="output4" readonly></textarea>
+                    <button class="btn-copy" onclick="copyToClipboard('output4', this)">복사</button>
+                    <div id="preview4" class="preview-box" style="display:none;"></div>
+                </div>
+                
+                <div class="output-box">
+                    <div class="preview-label">
+                        5. 전체 코드 (일괄)
+                        <button class="preview-toggle" onclick="togglePreview('preview5')">미리보기</button>
+                    </div>
+                    <textarea id="output5" readonly style="min-height: 200px;"></textarea>
+                    <button class="btn-copy" onclick="copyToClipboard('output5', this)">복사</button>
+                    <div id="preview5" class="preview-box" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 테이블 에디터 탭 -->
+        <div id="table-tab" class="tab-content">
+            <div class="table-editor">
+                <h2>📊 테이블 에디터</h2>
+                <p style="color: #666; margin-bottom: 20px; font-size: 14px;">
+                    셀을 클릭하여 내용을 수정하고, 셀 위에 마우스를 올리면 링크/이미지 추가 버튼이 나타납니다.
+                </p>
+                
+                <div class="table-controls">
+                    <button onclick="addTableRow()">➕ 행 추가</button>
+                    <button onclick="removeTableRow()">➖ 행 삭제</button>
+                    <button onclick="addTableColumn()">➕ 열 추가</button>
+                    <button onclick="removeTableColumn()">➖ 열 삭제</button>
+                    <button onclick="generateTableCode()">✨ HTML 생성</button>
+                    <button onclick="resetTable()">🔄 초기화</button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="editable-table" id="editableTable">
+                        <thead>
+                            <tr>
+                                <th><div class="cell-content" contenteditable="true">헤더 1</div></th>
+                                <th><div class="cell-content" contenteditable="true">헤더 2</div></th>
+                                <th><div class="cell-content" contenteditable="true">헤더 3</div></th>
+                                <th><div class="cell-content" contenteditable="true">헤더 4</div></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="cell-content" contenteditable="true">데이터 1</div>
+                                    <div class="cell-actions">
+                                        <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
+                                        <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content" contenteditable="true">데이터 2</div>
+                                    <div class="cell-actions">
+                                        <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
+                                        <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content" contenteditable="true">데이터 3</div>
+                                    <div class="cell-actions">
+                                        <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
+                                        <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cell-content" contenteditable="true">데이터 4</div>
+                                    <div class="cell-actions">
+                                        <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
+                                        <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="output-box" style="margin-top: 20px;">
+                    <div class="preview-label">
+                        📋 생성된 테이블 HTML
+                        <button class="preview-toggle" onclick="togglePreview('tablePreview')">미리보기</button>
+                    </div>
+                    <textarea id="tableOutput" readonly style="min-height: 200px;"></textarea>
+                    <button class="btn-copy" onclick="copyToClipboard('tableOutput', this)">복사</button>
+                    <div id="tablePreview" class="preview-box" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 히스토리 탭 -->
+        <div id="history-tab" class="tab-content">
+            <div class="history-section">
+                <h2>📜 생성 히스토리</h2>
+                <p style="color: #666; margin-bottom: 20px; font-size: 14px;">
+                    최근 생성한 코드 20개가 자동으로 저장됩니다.
+                </p>
+                <div id="historyList"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 링크 추가 모달 -->
+    <div id="linkModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">🔗 링크 추가</div>
+            <div class="input-group">
+                <label>🌐 링크 URL</label>
+                <input type="text" id="modalLinkUrl" placeholder="https://example.com">
+            </div>
+            <div class="input-group">
+                <label>✏️링크 텍스트</label>
+                <input type="text" id="modalLinkText" placeholder="클릭할 텍스트">
+            </div>
+            <div class="input-group">
+                <label>🎯 링크 열기</label>
+                <select id="modalLinkTarget">
+                    <option value="_self">현재 창 (self)</option>
+                    <option value="_blank">새 창 (blank)</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal('linkModal')">취소</button>
+                <button class="modal-btn modal-btn-primary" onclick="confirmAddLink()">추가</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 이미지 추가 모달 -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">🖼️ 이미지 추가</div>
+            <div class="input-group">
+                <label>🖼️ 이미지 URL</label>
+                <input type="text" id="modalImageUrl" placeholder="https://example.com/image.jpg">
+            </div>
+            <div class="input-group">
+                <label>📝 이미지 설명 (alt)</label>
+                <input type="text" id="modalImageAlt" placeholder="이미지 설명">
+            </div>
+            <div class="input-group">
+                <label>🌐 링크 URL (선택사항)</label>
+                <input type="text" id="modalImageLink" placeholder="https://example.com">
+            </div>
+            <div class="input-group">
+                <label>🎯 링크 열기</label>
+                <select id="modalImageTarget">
+                    <option value="_self">현재 창 (self)</option>
+                    <option value="_blank">새 창 (blank)</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal('imageModal')">취소</button>
+                <button class="modal-btn modal-btn-primary" onclick="confirmAddImage()">추가</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCell = null;
+        let history = [];
+        const MAX_HISTORY = 20;
+        
+        // 로컬스토리지에서 히스토리 로드
+        function loadHistory() {
+            const saved = localStorage.getItem('htmlGeneratorHistory');
+            if (saved) {
+                history = JSON.parse(saved);
+                renderHistory();
+            }
+        }
+        
+        // 히스토리 저장
+        function saveToHistory(code, type) {
+            const item = {
+                code: code,
+                type: type,
+                timestamp: new Date().toLocaleString('ko-KR')
+            };
+            
+            history.unshift(item);
+            if (history.length > MAX_HISTORY) {
+                history = history.slice(0, MAX_HISTORY);
+            }
+            
+            localStorage.setItem('htmlGeneratorHistory', JSON.stringify(history));
+            renderHistory();
+        }
+        
+        // 히스토리 렌더링
+        function renderHistory() {
+            const listEl = document.getElementById('historyList');
+            if (history.length === 0) {
+                listEl.innerHTML = '<p style="color: #999; text-align: center;">아직 생성된 코드가 없습니다.</p>';
+                return;
+            }
+            
+            listEl.innerHTML = history.map((item, index) => `
+                <div class="history-item">
+                    <div style="display: flex; flex-direction: column; flex: 1; gap: 5px;">
+                        <div style="font-size: 11px; color: #999;">${item.timestamp} · ${item.type}</div>
+                        <div class="history-item-content">${item.code}</div>
+                    </div>
+                    <div class="history-item-actions">
+                        <button class="btn-history btn-restore" onclick="restoreFromHistory(${index})">복원</button>
+                        <button class="btn-history btn-delete" onclick="deleteFromHistory(${index})">삭제</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 히스토리에서 복원
+        function restoreFromHistory(index) {
+            const item = history[index];
+            navigator.clipboard.writeText(item.code).then(() => {
+                alert('클립보드에 복사되었습니다!');
+            });
+        }
+        
+        // 히스토리에서 삭제
+        function deleteFromHistory(index) {
+            if (confirm('이 항목을 삭제하시겠습니까?')) {
+                history.splice(index, 1);
+                localStorage.setItem('htmlGeneratorHistory', JSON.stringify(history));
+                renderHistory();
+            }
+        }
+        
+        // 탭 전환
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+        
+        // 단축키 핸들러
+        function handleShortcut(event, callback) {
+            if (event.ctrlKey && event.key === 'Enter') {
+                event.preventDefault();
+                callback();
+            }
+        }
+        
+        // 전체 복사 단축키
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.shiftKey && event.key === 'C') {
+                event.preventDefault();
+                const output5 = document.getElementById('output5').value;
+                if (output5) {
+                    navigator.clipboard.writeText(output5).then(() => {
+                        alert('전체 코드가 클립보드에 복사되었습니다!');
+                    });
+                }
+            }
+        });
+        
+        // 미리보기 토글
+        function togglePreview(previewId) {
+            const previewEl = document.getElementById(previewId);
+            const outputId = previewId.replace('preview', 'output');
+            const outputEl = document.getElementById(outputId);
+            
+            if (previewEl.style.display === 'none') {
+                previewEl.style.display = 'block';
+                previewEl.innerHTML = outputEl.value;
+            } else {
+                previewEl.style.display = 'none';
+            }
+        }
+        
+        // 1. 일반 링크 생성
+        function generateLink1() {
+            const url = document.getElementById('link1-url').value;
+            const text = document.getElementById('link1-text').value;
+            const target = document.getElementById('link1-target').value;
+            
+            if (!url || !text) {
+                alert('모든 필드를 입력해주세요.');
+                return;
+            }
+            
+            const html = `<a href="${url}" target="${target}" rel="nofollow sponsored">\n  ${text}\n</a>`;
+            document.getElementById('output1').value = html;
+            saveToHistory(html, '일반 링크');
+        }
+        
+        // 2. 쿠팡 링크 생성
+        function generateLink2() {
+            const url = document.getElementById('link2-url').value;
+            const text = document.getElementById('link2-text').value;
+            
+            if (!url) {
+                alert('쿠팡 URL을 입력해주세요.');
+                return;
+            }
+            
+            const html = `<a href="${url}" target="_blank" rel="nofollow sponsored">\n  ${text}\n</a>`;
+            document.getElementById('output2').value = html;
+            saveToHistory(html, '쿠팡 링크');
+        }
+        
+        // 3. 이미지 링크 생성
+        function generateLink3() {
+            const url = document.getElementById('link3-url').value;
+            const img = document.getElementById('link3-img').value;
+            const alt = document.getElementById('link3-alt').value;
+            const target = document.getElementById('link3-target').value;
+            
+            if (!url || !img || !alt) {
+                alert('모든 필드를 입력해주세요.');
+                return;
+            }
+            
+            const html = `<a href="${url}" target="${target}" rel="nofollow sponsored">\n  <img\n    src="${img}"\n    alt="${alt}"\n    style="display:block; margin:0 auto; max-width:100%; height:auto;"\n    loading="lazy"\n    decoding="async"\n  />\n</a><br>`;
+            document.getElementById('output3').value = html;
+            saveToHistory(html, '이미지 링크');
+        }
+        
+        // 4. 공정위 문구 생성
+        function generateLink4() {
+            const text = document.getElementById('link4-text').value;
+            
+            if (!text) {
+                alert('문구를 입력해주세요.');
+                return;
+            }
+            
+            const html = `<div style="margin-top: 20px; font-size: 12px; color: #999; text-align: center;">\n  <p>${text}</p>\n</div>`;
+            document.getElementById('output4').value = html;
+            saveToHistory(html, '공정위 문구');
+        }
+        
+        // 5. 전체 일괄 생성
+        function generateAll() {
+            generateLink1();
+            generateLink2();
+            generateLink3();
+            generateLink4();
+            
+            const output1 = document.getElementById('output1').value;
+            const output2 = document.getElementById('output2').value;
+            const output3 = document.getElementById('output3').value;
+            const output4 = document.getElementById('output4').value;
+            
+            const allHtml = `<!-- 일반 링크 -->\n${output1}\n\n<!-- 쿠팡 링크 -->\n${output2}\n\n<!-- 이미지 링크 -->\n${output3}\n\n<!-- 공정위 문구 -->\n${output4}`;
+            
+            document.getElementById('output5').value = allHtml;
+            saveToHistory(allHtml, '일괄 생성');
+        }
+        
+        // 클립보드 복사
+        function copyToClipboard(elementId, button) {
+            const textarea = document.getElementById(elementId);
+            const text = textarea.value;
+            
+            if (!text) {
+                alert('생성된 코드가 없습니다.');
+                return;
+            }
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '복사됨!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                alert('복사 실패: ' + err);
+            });
+        }
+        
+        // 테이블 행 추가
+        function addTableRow() {
+            const table = document.getElementById('editableTable');
+            const tbody = table.querySelector('tbody');
+            const columnCount = table.querySelector('thead tr').children.length;
+            
+            const newRow = document.createElement('tr');
+            for (let i = 0; i < columnCount; i++) {
+                const td = document.createElement('td');
+                td.innerHTML = `
+                    <div class="cell-content" contenteditable="true">데이터 ${i + 1}</div>
+                    <div class="cell-actions">
+                        <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
+                        <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
+                    </div>
+                `;
+                newRow.appendChild(td);
+            }
+            tbody.appendChild(newRow);
+        }
+        
+        // 테이블 행 삭제
+        function removeTableRow() {
+            const table = document.getElementById('editableTable');
+            const tbody = table.querySelector('tbody');
+            if (tbody.children.length > 1) {
+                tbody.removeChild(tbody.lastChild);
+            } else {
+                alert('최소 1개의 행은 있어야 합니다.');
+            }
+        }
+        
+        // 테이블 열 추가
+        function addTableColumn() {
+            const table = document.getElementById('editableTable');
+            const thead = table.querySelector('thead tr');
+            const tbody = table.querySelector('tbody');
+            
+            const th = document.createElement('th');
+            th.innerHTML = '<div class="cell-content" contenteditable="true">헤더 ' + (thead.children.length + 1) + '</div>';
+            thead.appendChild(th);
+            
+            Array.from(tbody.children).forEach(row => {
+                const td = document.createElement('td');
+                td.innerHTML = `
+                    <div class="cell-content" contenteditable="true">데이터</div>
+                    <div class="cell-actions">
+                        <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
+                        <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
+                    </div>
+                `;
+                row.appendChild(td);
+            });
+        }
+        
+        // 테이블 열 삭제
+        function removeTableColumn() {
+            const table = document.getElementById('editableTable');
+            const thead = table.querySelector('thead tr');
+            const tbody = table.querySelector('tbody');
+            
+            if (thead.children.length > 1) {
+                thead.removeChild(thead.lastChild);
+                Array.from(tbody.children).forEach(row => {
+                    row.removeChild(row.lastChild);
+                });
+            } else {
+                alert('최소 1개의 열은 있어야 합니다.');
+            }
+        }
+        
+        // 테이블 초기화
+        function resetTable() {
+            if (confirm('테이블을 초기화하시겠습니까?')) {
+                const table = document.getElementById('editableTable');
+                const thead = table.querySelector('thead tr');
+                const tbody = table.querySelector('tbody');
+                
+                thead.innerHTML = `
+                    <th><div class="cell-content" contenteditable="true">헤더 1</div></th>
+                    <th><div class="cell-content" contenteditable="true">헤더 2</div></th>
+                    <th><div class="cell-content" contenteditable="true">헤더 3</div></th>
+                    <th><div class="cell-content" contenteditable="true">헤더 4</div></th>
+                `;
+                
+                tbody.innerHTML = `
+                    <tr>
+                        <td>
+                            <div class="cell-content" contenteditable="true">데이터 1</div>
+                            <div class="cell-actions">
+                                <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
+                                <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="cell-content" contenteditable="true">데이터 2</div>
+                            <div class="cell-actions">
+                                <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
+                                <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="cell-content" contenteditable="true">데이터 3</div>
+                            <div class="cell-actions">
+                                <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
+                                <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="cell-content" contenteditable="true">데이터 4</div>
+                            <div class="cell-actions">
+                                <button class="cell-btn" onclick="addLinkToCell(this)">🔗</button>
+                                <button class="cell-btn" onclick="addImageToCell(this)">🖼️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+        
+        // 셀에 링크 추가
+        function addLinkToCell(button) {
+            currentCell = button.parentElement.parentElement.querySelector('.cell-content');
+            document.getElementById('modalLinkText').value = currentCell.textContent.trim();
+            document.getElementById('linkModal').classList.add('active');
+        }
+        
+        // 셀에 이미지 추가
+        function addImageToCell(button) {
+            currentCell = button.parentElement.parentElement.querySelector('.cell-content');
+            document.getElementById('imageModal').classList.add('active');
+        }
+        
+        // 모달 닫기
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            currentCell = null;
+        }
+        
+        // 링크 추가 확인
+        function confirmAddLink() {
+            const url = document.getElementById('modalLinkUrl').value;
+            const text = document.getElementById('modalLinkText').value;
+            const target = document.getElementById('modalLinkTarget').value;
+            
+            if (!url || !text) {
+                alert('모든 필드를 입력해주세요.');
+                return;
+            }
+            
+            currentCell.innerHTML = `<a href="${url}" target="${target}" rel="nofollow sponsored">${text}</a>`;
+            closeModal('linkModal');
+            
+            // 입력 필드 초기화
+            document.getElementById('modalLinkUrl').value = '';
+            document.getElementById('modalLinkText').value = '';
+        }
+        
+        // 이미지 추가 확인
+        function confirmAddImage() {
+            const imageUrl = document.getElementById('modalImageUrl').value;
+            const imageAlt = document.getElementById('modalImageAlt').value;
+            const linkUrl = document.getElementById('modalImageLink').value;
+            const target = document.getElementById('modalImageTarget').value;
+            
+            if (!imageUrl || !imageAlt) {
+                alert('이미지 URL과 설명은 필수입니다.');
+                return;
+            }
+            
+            let html = `<img src="${imageUrl}" alt="${imageAlt}" style="max-width:100%; height:auto;" loading="lazy" decoding="async" />`;
+            
+            if (linkUrl) {
+                html = `<a href="${linkUrl}" target="${target}" rel="nofollow sponsored">${html}</a>`;
+            }
+            
+            currentCell.innerHTML = html;
+            closeModal('imageModal');
+            
+            // 입력 필드 초기화
+            document.getElementById('modalImageUrl').value = '';
+            document.getElementById('modalImageAlt').value = '';
+            document.getElementById('modalImageLink').value = '';
+        }
+        
+        // 테이블 HTML 생성
+        function generateTableCode() {
+            const table = document.getElementById('editableTable');
+            const thead = table.querySelector('thead');
+            const tbody = table.querySelector('tbody');
+            
+            let html = '<div style="overflow-x: auto; margin: 30px 0;">\n';
+            html += '  <table style="width: 100%; border-collapse: collapse; min-width: 500px;">\n';
+            
+            // 헤더
+            html += '    <thead>\n';
+            html += '      <tr style="background-color: #f0f0f0; border-bottom: 2px solid #ccc;">\n';
+            Array.from(thead.querySelectorAll('th')).forEach(th => {
+                const content = th.querySelector('.cell-content').innerHTML;
+                html += `        <th style="padding: 12px; text-align: left; font-weight: bold;">${content}</th>\n`;
+            });
+            html += '      </tr>\n';
+            html += '    </thead>\n';
+            
+            // 바디
+            html += '    <tbody>\n';
+            Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+                html += '      <tr style="border-bottom: 1px solid #eee;">\n';
+                Array.from(tr.querySelectorAll('td')).forEach(td => {
+                    const content = td.querySelector('.cell-content').innerHTML;
+                    html += `        <td style="padding: 12px;">${content}</td>\n`;
+                });
+                html += '      </tr>\n';
+            });
+            html += '    </tbody>\n';
+            
+            html += '  </table>\n';
+            html += '</div>';
+            
+            document.getElementById('tableOutput').value = html;
+            saveToHistory(html, '테이블');
+        }
+        
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+        
+        // 페이지 로드 시 히스토리 로드
+        loadHistory();
+    </script>
+</body>
+</html>
