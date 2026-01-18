@@ -943,7 +943,9 @@
                 return false;
             }
             
-            const html = `<a href="${url}" target="${target}" rel="nofollow sponsored">\n  ${text}\n</a>`;
+            const html = `<a href="${url}" target="${target}" rel="nofollow sponsored">
+  ${text}
+</a>`;
             document.getElementById('output1').value = html;
             saveToHistory(html, '일반 링크');
             return true;
@@ -959,13 +961,15 @@
                 return false;
             }
             
-            const html = `<a href="${url}" target="_blank" rel="nofollow sponsored">\n  ${text}\n</a>`;
+            const html = `<a href="${url}" target="_blank" rel="nofollow sponsored">
+  ${text}
+</a>`;
             document.getElementById('output2').value = html;
             saveToHistory(html, '쿠팡 링크');
             return true;
         }
         
-        // 3. 이미지 링크 생성 (링크 선택사항)
+        // 3. 이미지 링크 생성 (앞뒤로 <br> 추가)
         function generateLink3() {
             const url = document.getElementById('link3-url').value.trim();
             const img = document.getElementById('link3-img').value.trim();
@@ -981,10 +985,28 @@
             
             // 링크 URL이 있으면 링크로 감싸기
             if (url) {
-                html = `<a href="${url}" target="${target}" rel="nofollow sponsored">\n  <img\n    src="${img}"\n    alt="${alt}"\n    style="display:block; margin:0 auto; max-width:100%; height:auto;"\n    loading="lazy"\n    decoding="async"\n  />\n</a><br>`;
+                html = `<br>
+<a href="${url}" target="${target}" rel="nofollow sponsored">
+  <img
+    src="${img}"
+    alt="${alt}"
+    style="display:block; margin:0 auto; max-width:100%; height:auto;"
+    loading="lazy"
+    decoding="async"
+  />
+</a>
+<br>`;
             } else {
                 // 링크 URL이 없으면 이미지만
-                html = `<img\n  src="${img}"\n  alt="${alt}"\n  style="display:block; margin:0 auto; max-width:100%; height:auto;"\n  loading="lazy"\n  decoding="async"\n/><br>`;
+                html = `<br>
+<img
+  src="${img}"
+  alt="${alt}"
+  style="display:block; margin:0 auto; max-width:100%; height:auto;"
+  loading="lazy"
+  decoding="async"
+/>
+<br>`;
             }
             
             document.getElementById('output3').value = html;
@@ -1001,13 +1023,15 @@
                 return false;
             }
             
-            const html = `<div style="margin-top: 20px; font-size: 12px; color: #999; text-align: center;">\n  <p>${text}</p>\n</div>`;
+            const html = `<div style="margin-top: 20px; font-size: 12px; color: #999; text-align: center;">
+  <p>${text}</p>
+</div>`;
             document.getElementById('output4').value = html;
             saveToHistory(html, '공정위 문구');
             return true;
         }
         
-        // 5. 전체 일괄 생성 (수정됨 - 입력된 것만 생성)
+        // 5. 전체 일괄 생성 (입력된 것만 생성)
         function generateAll() {
             let results = [];
             
